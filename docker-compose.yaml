@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  drake:
+    image:  matt54215/drake:v1
+    container_name: drake
+    hostname: drake
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY}:/root/.Xauthority
+      - ../drake-external-examples:/root/drake-ws
+      # Also need to run "xhost +local:" on host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+    init: true
+    privileged: true
+    command: [ "bash", "-c", "trap : INT TERM; sleep infinity & wait" ]
+
+
+volumes:
+  drake_build:
+

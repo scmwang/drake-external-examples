@@ -55,37 +55,34 @@ if [[ "${EUID:-}" -ne 0 ]]; then
 fi
 
 apt-get update
-apt-get install --no-install-recommends lsb-release
+apt-get -y install --no-install-recommends lsb-release
 
 if [[ "$(lsb_release -sc)" != 'focal' ]]; then
   echo 'This script requires Ubuntu 20.04 (Focal Fossa)' >&2
   exit 3
 fi
 
-apt-get install --no-install-recommends $(cat <<EOF
+apt-get -y install --no-install-recommends $(cat <<EOF
   ca-certificates
   wget
 EOF
 )
 
-wget -O drake.tar.gz \
-  https://drake-packages.csail.mit.edu/drake/nightly/drake-latest-focal.tar.gz
-trap 'rm -f drake.tar.gz' EXIT
-tar -xf drake.tar.gz -C /opt
 
 # Show version for debugging; use echo for newline / readability.
 echo -e "\ndrake VERSION.TXT: $(cat /opt/drake/share/doc/drake/VERSION.TXT)\n"
 
-/opt/drake/share/drake/setup/install_prereqs
+/opt/drake/share/drake/setup/install_prereqs -y
 
-apt-get install --no-install-recommends gnupg
+apt-get -y install --no-install-recommends gnupg
 
 apt-key adv --fetch-keys https://bazel.build/bazel-release.pub.gpg
 echo 'deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8' \
   > /etc/apt/sources.list.d/bazel.list
 
 apt-get update
-apt-get install --no-install-recommends $(cat <<EOF
+apt-get -y install --no-install-recommends $(cat <<EOF
+  sudo
   bazel
   clang-format-12
   cmake
@@ -146,7 +143,7 @@ if [[ ${ros_foxy} -eq 1 ]]; then
     > /etc/apt/sources.list.d/ros2-latest.list
 
   apt-get update
-  apt-get install --no-install-recommends $(cat <<EOF
+  apt-get -y install --no-install-recommends $(cat <<EOF
     python3-colcon-common-extensions
     ros-foxy-ament-cmake
     ros-foxy-ament-cmake-gtest
@@ -164,13 +161,13 @@ if [[ ${ros_noetic} -eq 1 ]]; then
     > /etc/apt/sources.list.d/ros-latest.list
 
   apt-get update
-  apt-get install --no-install-recommends ros-noetic-catkin
+  apt-get -y install --no-install-recommends ros-noetic-catkin
 fi
 
 
 
 if [[ ${ros_foxy} -ne 1 && ${ros_noetic} -ne 1 ]]; then
-  apt-get install --no-install-recommends $(cat <<EOF
+  apt-get -y install --no-install-recommends $(cat <<EOF
   catkin
   python3-pkg-resources
 EOF
